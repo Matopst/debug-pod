@@ -4,40 +4,47 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
 
 env:
   IMAGE_NAME: ghcr.io/matopst/debug-pod
 
 jobs:
-  build_push:
+  build_and_push:
     runs-on: ubuntu-latest
     permissions:
-      packages: write
       contents: read
+      packages: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Ko
-        uses: ko-build/setup-ko@v0.6
 
       - name: Set BUILD_VERSION
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             echo "BUILD_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
           else
-            echo "BUILD_VERSION=latest" >> $GITHUB_ENV
+            echo "BUILD_VERSION=main" >> $GITHUB_ENV
           fi
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          registry: ghcr.io
 
-      - name: Build and push image with Ko
+      - name: Build and push Docker image with version and latest tags
         run: |
-          echo "Publishing image as: $IMAGE_NAME:$BUILD_VERSION"
-          KO_DOCKER_REPO=${{ env.IMAGE_NAME }} ko publish . --bare -t $BUILD_VERSION
+          VERSION_TAG=${{ env.IMAGE_NAME }}:${{ env.BUILD_VERSION }}
+          LATEST_TAG=${{ env.IMAGE_NAME }}:latest
+
+          echo "Building image with tags:"
+          echo " - $VERSION_TAG"
+          echo " - $LATEST_TAG"
+
+          docker build -t $VERSION_TAG -t $LATEST_TAG .
+          docker push $VERSION_TAG
+          docker push $LATEST_TAG
