@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  IMAGE_NAME: ghcr.io/Matopst/debug-pod
+  IMAGE_NAME: ghcr.io/matopst/debug-pod
 
 jobs:
   build_push:
