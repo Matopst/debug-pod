@@ -10,6 +10,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: debug-pod
+  namespace: default
   labels:
     app: debug
 spec:
@@ -23,6 +24,10 @@ spec:
       command: ["sleep", "infinity"]
       securityContext:
         allowPrivilegeEscalation: false
+			resources:
+        requests:
+          memory: "50Mi"
+					cpu: "20m"
   restartPolicy: Never
 
 ```
@@ -32,13 +37,23 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: debug-root
+  name: debug-pod
+  namespace: default
   labels:
     app: debug
 spec:
+  securityContext:
+    runAsUser: 0
   containers:
     - name: debug
       image: ghcr.io/matopst/debug-pod:latest
       command: ["sleep", "infinity"]
+      securityContext: 
+        allowPrivilegeEscalation: true
+      resources:
+        requests:
+          memory: "50Mi"
+					cpu: "20m"
   restartPolicy: Never
+
 ```
