@@ -24,10 +24,10 @@ spec:
       command: ["sleep", "infinity"]
       securityContext:
         allowPrivilegeEscalation: false
-			resources:
+      resources:
         requests:
           memory: "50Mi"
-					cpu: "20m"
+          cpu: "20m"
   restartPolicy: Never
 
 ```
@@ -48,12 +48,13 @@ spec:
     - name: debug
       image: ghcr.io/matopst/debug-pod:latest
       command: ["sleep", "infinity"]
-      securityContext: 
+      securityContext:
         allowPrivilegeEscalation: true
       resources:
         requests:
           memory: "50Mi"
-					cpu: "20m"
+          cpu: "20m"
   restartPolicy: Never
+
 
 ```
